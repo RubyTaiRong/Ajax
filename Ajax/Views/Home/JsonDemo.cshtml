@@ -1,0 +1,43 @@
+﻿
+@{
+    ViewData["Title"] = "JsonDemo";
+}
+
+<h1>JsonDemo</h1>
+<ul id="employees"></ul>
+
+@section Scripts{
+    <script>
+        const emps = [{ "name": "Tom", "workYears": 3, "salary": 35000 },
+        { "name": "Jack", "workYears": 5, "salary": 40000 },
+        { "name": "Mary", "workYears": 7, "salary": 45000 }];
+        //console.log(emps);
+        console.log('Name: '+emps[0].name);
+        console.log(emps[0].workYears);
+        for (let i = 0, Max = emps.length; i < Max; i++) {
+            console.log(emps[i]);
+        }
+        
+
+        // const display=emps.map(emp=>`<li>${emp.name}`)
+            const display = emps.map((v, i) => {
+            return (`
+            <li>${v.name} / ${ v.workYears } /${v.salary}</li> 
+            `);
+            })
+            .join('')
+        
+
+        document.getElementById('employees').innerHTML = display;
+
+
+
+
+
+        // for (let i = 0, Max = emps.length; i < Max; i++) {
+        //     let li=document.createElement('li')
+        //     li.textContent=emps[i]
+        //     document.getElementById('employees').appendChild(li)
+        // }
+    </script>
+}
