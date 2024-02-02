@@ -1,0 +1,25 @@
+﻿
+@{
+    ViewData["Title"] = "Avatar";
+}
+
+<h1>Avatar</h1>
+<img id="img1" class="img-thumbnail w-50" />
+
+@section Scripts{
+    <script>
+        const img = document.querySelector('#img1');
+        (async() => {
+            //ApiController.cs Action函式上有給參數 id=1
+            //所以網址可以直接給圖片id，不用加上 ?id=1
+            //const url='@Url.Content("~/api/avatar/")?id=1'
+            const url='@Url.Content("~/api/avatar/1")'
+            const response =await fetch(url);
+            const datas =await response.blob();
+            img.src = URL.createObjectURL(datas);
+        })();
+
+    </script>
+    
+}
+

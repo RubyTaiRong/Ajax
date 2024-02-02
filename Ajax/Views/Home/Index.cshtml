@@ -9,6 +9,39 @@
 
 @section Scripts{
     <script>
+        //建立Promise物件
+        const promise= new Promise((resolve,reject)=>{
+            //非同步程式碼
+            //例如：XMLHttpRequest、FileReader、
+                if (true) {
+                    resolve("成功");
+                } else {
+                    reject("失敗");
+                }
+        })
+        //使用Promise物件
+        // console.log(promise)
+        promise
+        .then(data=>console.log(`success:${data}`))
+        .catch(err=>console.log(`error:${err}`))
+        .finally(()=>console.log("end"))
+       
+        //執行後 Browser上的console會出現
+        //sucess:成功 (因建立Promise物件時，if(true))
+        //end
+        
+
+
+        //練習運用Promise印出A、B、C
+        function printSomething(data) {
+            return new Promise((resolve, reject) => {
+                    setTimeout(()=> {
+                    resolve(data);
+                }, 1000)
+        })
+        }
+        console.log(printSomething("測試"));
+
         function Show(data) {
             const promise = new Promise(function (resolve, reject){
                 setTimeout(function () {
@@ -35,5 +68,4 @@
 //             console.log(data);
 // }
     </script>
-
 }

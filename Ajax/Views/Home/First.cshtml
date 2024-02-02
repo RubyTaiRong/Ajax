@@ -1,0 +1,106 @@
+﻿
+@{
+    ViewData["Title"] = "First";
+}
+
+<h1>First Ajax Demo</h1>
+<input type="button" class="btn btn-primary m-2" value="Ajax 開始" id="buttonStart" />
+<div class="alert alert-info" id="divInfo"></div>
+<input type="button" class="btn btn-primary m-2" value="Ajax 開始(Async/await)" id="buttonStart1" />
+<img src="~/images/Winter.gif" id="imgLoading" style="display:none"/>
+<input type="button" class="btn btn-primary m-2" value="Ajax 停止" id="buttonStop" />
+<div class="alert alert-info" id="divInfo1"></div>
+
+@section Scripts {
+    <script>
+        const btnStart = document.querySelector('#buttonStart')
+        const divInfo = document.querySelector('#divInfo')
+
+        btnStart.addEventListener('click', () => {
+            //Ajax
+            console.log(fetch('/api/Index'));
+
+            fetch('@Url.Content("~/api/index")')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`有錯誤，狀態碼:${response.status}`);
+                        }
+                        console.log(response);
+                        //console.log(response.text());  //respone.text(); 只能讀取一次
+
+                        //讀取header
+                        //方法一：使用forEach()
+                        response.headers.forEach((value, name) => {
+                            console.log(`${name}:${value}`);
+                        })
+                        //方法二：只讀取單一資料
+                        console.log(`Content-length:${response.headers.get('content-length')}`);
+                        console.log(`Content-Type:${response.headers.get('content-type')}`);
+                        console.log(`Date:${response.headers.get('date')}`);
+                        (`Content-length:${response.headers.get('content-length')}`);
+                        return response.text();
+                    })
+                    .then(data => {
+                        console.log(data);
+                        divInfo.innerHTML = `<h3>${data}</h3>`;
+                    })            
+        })
+
+        //-------------------------------------------------------
+        //改用 Async/await寫法
+        const btnStart1 = document.querySelector('#buttonStart1')
+        const divInfo1 = document.querySelector('#divInfo1')
+        const imgLoader=document.getElementById('imgLoading')
+        const btnStop=document.getElementById('buttonStop')
+
+        btnStop.addEventListener('click', () => {
+            if (abortController) {
+                abortController.abort();
+            }
+
+        })
+
+        let abortController;
+
+        btnStart1.addEventListener('click',async()=>{
+            try {
+                imgLoader.style.display = "inline";
+                btnStart1.setAttribute('disabled', 'disabled');
+                btnStart1.value="執行中";
+
+                abortController = new AbortController();
+                //宣告一個常數 singnal，此時名稱故意與signal屬性相同
+                const signal = abortController.signal;
+
+                //5秒鐘程式仍在執行沒有回傳結果的話，就停止執行
+                setTimeout(() => {
+                    abortController.abort();
+                },5000)
+               
+                const response = await fetch('@Url.Content("~/api/index")', { signal });
+                if (!response.ok) {
+                    throw new Error(`有錯誤，狀態碼:${response.status}`);
+                }
+                const data = await response.text();
+                divInfo1.innerHTML = `<h3>${data}</h3>`;
+            } catch (error) {
+                //顯示網頁錯誤訊息
+                //divInfo1.innerHTML = `<h2>${error.message}</h2>`
+                
+                //顯示自定義錯誤訊息
+                let message = error.message;
+                if(error.name==="AbortError"){
+                    message = "伺服器忙線中，請稍後再嘗試";
+                }
+                divInfo1.innerHTML=`<h3>${message}</h3>`
+            } finally {
+                imgLoader.style.display = "none";
+                btnStart1.removeAttribute('disabled');
+                btnStart1.value = "Ajax 開始(Async / Await)";
+                console.log('finally') 
+            }
+        })
+    </script>
+}
+
+

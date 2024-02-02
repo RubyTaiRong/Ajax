@@ -1,0 +1,87 @@
+﻿
+@{
+    ViewData["Title"] = "Spots";
+}
+
+<h1>Spots</h1>
+<nav aria-label="Page navigation example">
+    <ul class="pagination" id="ulPaging">
+                
+    </ul>
+</nav>
+<div class="row row-cols-1 row-cols-md-3 g-4" id="card">
+   
+       
+</div>
+
+@section Scripts{
+    <script>
+        const Div = document.querySelector('#card');
+        const ulPaging = document.querySelector('#ulPaging');
+        const searchData = {
+            "categoryId":0,
+            "keyword":"北投",
+            "page":1,
+            "pageSize":5,
+            "sortType":"asc",
+            "sortBy":""
+        }
+        const loadSpots = async () => {
+            const url = '@Url.Content("~/api/spots")'
+            const response = await fetch(url, {
+                method: 'POST',
+                body: JSON.stringify(searchData),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            const datas = await response.json();
+            console.log(datas.spotsResult);
+            //console.log(typeof(datas))
+
+            const display = datas.spotsResult.map(spot => {
+                const { spotId, spotTitle, spotImage, address, spotDescription } = spot;
+                return (`
+                                    <div class="col">
+                                        <div class="card h-100">
+                                               <img src="${spotImage}" class="card-img-top" alt="${spotTitle}">
+                                                     <div class="card-body">
+                                                          <h5 class="card-title">${spotId} - ${spotTitle}</h5>
+                                                          <p class="card-text">${spotDescription.length <= 150 ? spotDescription : spotDescription.substring(0, 150)}</p>
+                                                       </div>
+                                                     <div class="card-footer">
+                                                          <small class="text-body-secondary" > ${address} </small>
+                                                      </div>
+                                       </div>
+                                    </div>
+                                    `)
+            })
+            Div.innerHTML = display.join('');
+
+            //顯示分頁功能，測試目前搜尋條件下，有幾頁
+            //console.log(datas.totalPages);
+
+            //將頁面加入至ul中，並提供onclick事件，改變頁面資料內容
+            let liPaging = "";
+            for (let i = 1, max = datas.totalPages; i <= max; i++) {
+                //測試是否有讀出每個頁面
+                //console.log(i);
+                liPaging += `<li class="page-item" onclick="pagingHandler(${i})" > <a class="page-link" href = "#" > ${i} </a></li>`
+            }
+            ulPaging.innerHTML = liPaging;
+        };
+        const pagingHandler = (page) => {
+            
+            //測試是否有抓到目前點選的頁面
+            console.log(page);
+            searchData.page = page;
+            loadSpots();
+        }
+        loadSpots();
+
+        
+
+
+
+    </script>
+}

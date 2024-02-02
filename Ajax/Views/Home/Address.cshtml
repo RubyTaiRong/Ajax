@@ -1,0 +1,89 @@
+﻿
+@{
+    ViewData["Title"] = "Address";
+}
+
+<h1>Address</h1>
+<select id="selectCities">
+    
+</select>
+<select id="selectDistricts">
+
+</select>
+<select id="selectRoads">
+</select>
+
+@section Scripts
+{
+    <script>
+        const selCity = document.querySelector('#selectCities');
+        const selDistrict = document.querySelector('#selectDistricts');
+        const selRoad = document.querySelector('#selectRoads');
+     
+
+        (async () => {
+               // const url = '@Url.Content("~/api/cities")';
+                const response = await fetch('@Url.Content("~/api/cities")');
+                const datas = await response.json();
+                //測試是否有成功讀取資料
+                // console.log(datas);
+
+                //將城市名稱放入下拉式選單
+            const optCity = datas.map(city => `<option value="${city}">${city}</option>`);
+            selCity.innerHTML = optCity.join('');
+
+            //測試是否可以抓取目前所選到城市及鄉鎮區的索引值
+            // console.log(selCity.selectedIndex);
+            //console.log(selCity.options[selCity.selectedIndex].value);
+            //console.log(selDistrict.options[selDistrict.selectedIndex].value); 
+            //如果放在下面 loadDistricts(); 會讀不到城市
+            loadDistricts();            
+
+        })();
+        
+        const loadDistricts = async ()=>{
+            
+            //抓取目前城市的名稱
+            
+            const city = selCity.options[selCity.selectedIndex].value;
+
+            const url = `@Url.Content("~/api/districts")?city=${city}`;
+            const response = await fetch(url);
+            const datas = await response.json();
+
+            //測試是否有成功讀取資料，需要呼叫loadDistricts()
+            //console.log(datas);
+
+            const optDistrict = datas.map(district => `<option value="${district}">${district}</option>`);
+            selDistrict.innerHTML = optDistrict.join('');
+            //畫面載入時一同生成路名
+            loadRoads();
+        }
+
+        const loadRoads = async () => {
+            
+            //抓取目前城市及鄉鎮區的名稱
+            const city = selCity.options[selCity.selectedIndex].value;
+            const district = selDistrict.options[selDistrict.selectedIndex].value;
+            console.log(city);
+            console.log(district);
+
+            const url = `@Url.Content("~/api/roads")?city=${city}&district=${district}`;
+            const response = await fetch(url);
+            const datas= await response.json();
+            //測試是否有成功讀取資料，需要呼叫loadRoads()
+            //console.log(datas);
+            
+            const optRoad = datas.map(road => `<option value="${road}">${road}</option>`);
+            selRoad.innerHTML = optRoad.join('');
+        }
+        //loadRoads();
+
+        selCity.addEventListener('change', loadDistricts);
+        selDistrict.addEventListener('change', loadRoads);
+        
+            
+        
+
+    </script>
+}
